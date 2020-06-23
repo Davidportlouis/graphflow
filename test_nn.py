@@ -1,5 +1,5 @@
 # testing functions
-from miniflow.miniflow import Add,Mul,forward_pass,topological_sort,Input,Linear
+from miniflow.miniflow import *
 
 def test_add():
     x,y,z = Input(),Input(),Input()
@@ -21,12 +21,12 @@ def test_linear():
     inputs,weights,bias = Input(),Input(),Input()
     linear = Linear(inputs,weights,bias)
     feed_dict = {
-        inputs:[5,10,15],
-        weights:[2,3,1],
-        bias: 1
+        inputs: np.array([[2,4,6],[1,3,5]]),
+        weights: np.array([[1],[2,],[3]]),
+        bias: np.array([1])
     }
     sorted_nodes = topological_sort(feed_dict)
     output = forward_pass(linear,sorted_nodes)
-    assert(output == 56)
+    assert((output == np.array([[29],[23]])).all())
     
     

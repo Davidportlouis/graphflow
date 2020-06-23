@@ -64,10 +64,7 @@ class Linear(Node):
         Node.__init__(self,[inputs,weights,bias])
 
     def forward(self):
-        self.value = 0
-        for j in range(len(self.inbound_nodes[0].value)):
-            self.value += self.inbound_nodes[0].value[j] * self.inbound_nodes[1].value[j]
-        self.value += self.inbound_nodes[2].value
+        self.value = np.dot(self.inbound_nodes[0].value,self.inbound_nodes[1].value) + self.inbound_nodes[2].value
 
 
 def topological_sort(feed_dict):
