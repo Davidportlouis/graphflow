@@ -28,5 +28,13 @@ def test_linear():
     sorted_nodes = topological_sort(feed_dict)
     output = forward_pass(linear,sorted_nodes)
     assert((output == np.array([[29],[23]])).all())
+
+def test_sigmoid():
+    z = Input()
+    sig = Sigmoid(z)
+    feed_dict = {z:0}
+    graph = topological_sort(feed_dict)
+    output = forward_pass(sig,graph)
+    assert(output == 0.5)
     
     

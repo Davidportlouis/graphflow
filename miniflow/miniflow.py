@@ -66,6 +66,17 @@ class Linear(Node):
     def forward(self):
         self.value = np.dot(self.inbound_nodes[0].value,self.inbound_nodes[1].value) + self.inbound_nodes[2].value
 
+class Sigmoid(Node):
+    def __init__(self,node):
+        Node.__init__(self,[node])
+
+    def sigmoid(self,z):
+        return 1.0/(1 + np.exp(-z))
+
+    def forward(self):
+        self.value = self.sigmoid(self.inbound_nodes[0].value)
+
+
 
 def topological_sort(feed_dict):
     """
