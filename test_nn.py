@@ -37,4 +37,13 @@ def test_sigmoid():
     output = forward_pass(sig,graph)
     assert(output == 0.5)
     
-    
+def test_MSE():
+    y,a = Input(),Input()
+    cost = MSE(y,a)
+    feed_dict={
+        y:np.array([[1,2,3]]),
+        a:np.array([[4.5,5,10]])
+    }
+    graph = topological_sort(feed_dict)
+    output = forward_pass(cost,graph)
+    assert(round(output,2) == 23.42)
