@@ -39,7 +39,8 @@ class Input(Node):
          # Overwrite the value if one is passed in.
          if value is not None:
              self.value = value
-    
+
+## simple mathematical operations
 class Add(Node):
     def __init__(self,*inputs):
         Node.__init__(self,inputs)
@@ -57,6 +58,17 @@ class Mul(Node):
         self.value = 1
         for i in range(len(self.inbound_nodes)):
             self.value *= self.inbound_nodes[i].value
+
+class Linear(Node):
+    def __init__(self,inputs,weights,bias):
+        Node.__init__(self,[inputs,weights,bias])
+
+    def forward(self):
+        self.value = 0
+        for j in range(len(self.inbound_nodes[0].value)):
+            self.value += self.inbound_nodes[0].value[j] * self.inbound_nodes[1].value[j]
+        self.value += self.inbound_nodes[2].value
+
 
 def topological_sort(feed_dict):
     """
