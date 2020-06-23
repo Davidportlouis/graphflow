@@ -18,7 +18,7 @@ class Node(object):
         must be implemented in all
         subclasses
         """
-        raise NotImplemented
+        pass
 
 class Input(Node):
     def __init__(self):
@@ -41,11 +41,22 @@ class Input(Node):
              self.value = value
     
 class Add(Node):
-    def __init__(self,x,y):
-        Node.__init__(self,[x,y])
+    def __init__(self,*inputs):
+        Node.__init__(self,inputs)
 
     def forward(self):
-        self.value = self.inbound_nodes[0].value + self.inbound_nodes[1].value
+        self.value = 0
+        for i in range(len(self.inbound_nodes)):
+            self.value += self.inbound_nodes[i].value
+
+class Mul(Node):
+    def __init__(self,*inputs):
+        Node.__init__(self,inputs)
+
+    def forward(self):
+        self.value = 1
+        for i in range(len(self.inbound_nodes)):
+            self.value *= self.inbound_nodes[i].value
 
 def topological_sort(feed_dict):
     """
