@@ -1,2 +1,2 @@
-# miniflow
-Simple Neural network library using numpy based on DLND in udacity
+# graphflow
+library for numerical computation using flow graphs
