@@ -12,13 +12,20 @@ class Node(object):
             node.outbound_nodes.append(self)
         # value of current node
         self.value = None
-
+        # gradients of current node
+        self.gradients = {}
+        
     def forward(self):
         """
-        must be implemented in all
-        subclasses
+        must be implemented in all subclasses
         """
-        pass
+        raise NotImplementedError
+
+    def backward(self):
+        """
+        must be implemented in all subclasses 
+        """
+        raise NotImplementedError
 
 class Input(Node):
     def __init__(self):
@@ -35,10 +42,16 @@ class Input(Node):
     # Example:
     # val0 = self.inbound_nodes[0].value
 
-    def forward(self,value=None):
-         # Overwrite the value if one is passed in.
-         if value is not None:
-             self.value = value
+    def forward(self):
+        pass
+
+    def backward(self):
+        self.gradients = {"self":0}
+        for n in self.outbound_nodes:
+            grad_cost = n.gradients[self]
+            self.gradients[self] += grad_cost * 1
+
+    
 
 ## simple mathematical operations
 class Add(Node):
@@ -125,7 +138,16 @@ def topological_sort(feed_dict):
 
     return L
 
-def forward_pass(output_node,sorted_nodes):
-    for n in sorted_nodes:
+def forward_and_backward(graph):
+
+    """
+    Performs a forward pass and backward pass through a list 
+    of sorted nodes
+    """
+
+    for n in graph:
         n.forward()
-    return output_node.value
+
+    for n in graph[::-1]:
+        n.backward()
+

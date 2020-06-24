@@ -1,5 +1,5 @@
 # testing functions
-from miniflow.miniflow import *
+from graphflow.graphflow import *
 
 def test_add():
     x,y,z = Input(),Input(),Input()
