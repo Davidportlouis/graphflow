@@ -33,15 +33,6 @@ class Input(Node):
         # so no need to pass anything to Node class instantiator
         Node.__init__(self)
 
-    # NOTE: Input node is the only node where the value
-    # may be passed as an argument to forward().
-    #
-    # All other node implementations should get the value
-    # of the previous node from self.inbound_nodes
-    #
-    # Example:
-    # val0 = self.inbound_nodes[0].value
-
     def forward(self):
         pass
 
@@ -51,33 +42,22 @@ class Input(Node):
             grad_cost = n.gradients[self]
             self.gradients[self] += grad_cost * 1
 
-    
-
-## simple mathematical operations
-class Add(Node):
-    def __init__(self,*inputs):
-        Node.__init__(self,inputs)
-
-    def forward(self):
-        self.value = 0
-        for i in range(len(self.inbound_nodes)):
-            self.value += self.inbound_nodes[i].value
-
-class Mul(Node):
-    def __init__(self,*inputs):
-        Node.__init__(self,inputs)
-
-    def forward(self):
-        self.value = 1
-        for i in range(len(self.inbound_nodes)):
-            self.value *= self.inbound_nodes[i].value
-
 class Linear(Node):
     def __init__(self,inputs,weights,bias):
         Node.__init__(self,[inputs,weights,bias])
 
     def forward(self):
-        self.value = np.dot(self.inbound_nodes[0].value,self.inbound_nodes[1].value) + self.inbound_nodes[2].value
+        self.value = np.dot(self.inbound_nodes[0].value,self.inbound_nodes[1].value) 
+        + self.inbound_nodes[2].value
+
+    def backward(self):
+        self.gradients = {n:np.zeros_like(n.value) for n in self.inbound_nodes}
+        for n in self.outbound_nodes:
+            grad_cost = n.gradients[self]
+            self.gradients[self.inbound_nodes[0]] += np.dot(grad_cost,self.inbound_nodes[1].value.T)
+            self.gradients[self.inbound_nodes[1]] += np.dot(self.inbound_nodes[2].value.T,grad_cost)
+            self.gradients[self.inbound_nodes[2]] += np.sum(grad_cost,axis=0,keepdims=False)
+    
 
 class Sigmoid(Node):
     def __init__(self,node):
@@ -89,6 +69,12 @@ class Sigmoid(Node):
     def forward(self):
         self.value = self.sigmoid(self.inbound_nodes[0].value)
 
+    def backward(self):
+        self.gradients = {n:np.zeros_like(n.value) for n in self.inbound_nodes}
+        for n in self.outbound_nodes:
+            grad_cost = n.gradients[self]
+            self.gradients[self.inbound_nodes[0]] += grad_cost * self.value * (1 - self.value)
+
 
 class MSE(Node):
     def __init__(self,y,a):
@@ -97,7 +83,13 @@ class MSE(Node):
     def forward(self):
         y = self.inbound_nodes[0].value.reshape(-1,1)
         a = self.inbound_nodes[1].value.reshape(-1,1)
-        self.value = np.sum((y-a)**2)/len(y)
+        self.diff = y - a
+        self.m = self.inbound_nodes[0].value.shape[0]
+        self.value = np.sum(self.diff**2)/len(y)
+
+    def backward(self):
+        self.gradients[self.inbound_nodes[0]] = (2/self.m) * self.diff
+        self.gradients[self.inbound_nodes[1]] = (-2/self.m) * self.diff
 
 
 
