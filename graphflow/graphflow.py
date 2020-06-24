@@ -143,3 +143,6 @@ def forward_and_backward(graph):
     for n in graph[::-1]:
         n.backward()
 
+def sgd_update(trainables,alpha=1e-2):
+    for t in trainables:
+        t.value -= alpha * t.gradients[t]
