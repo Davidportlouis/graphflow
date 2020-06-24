@@ -37,7 +37,7 @@ class Input(Node):
         pass
 
     def backward(self):
-        self.gradients = {"self":0}
+        self.gradients = {self:0}
         for n in self.outbound_nodes:
             grad_cost = n.gradients[self]
             self.gradients[self] += grad_cost * 1
@@ -55,7 +55,7 @@ class Linear(Node):
         for n in self.outbound_nodes:
             grad_cost = n.gradients[self]
             self.gradients[self.inbound_nodes[0]] += np.dot(grad_cost,self.inbound_nodes[1].value.T)
-            self.gradients[self.inbound_nodes[1]] += np.dot(self.inbound_nodes[2].value.T,grad_cost)
+            self.gradients[self.inbound_nodes[1]] += np.dot(self.inbound_nodes[0].value.T,grad_cost)
             self.gradients[self.inbound_nodes[2]] += np.sum(grad_cost,axis=0,keepdims=False)
     
 
